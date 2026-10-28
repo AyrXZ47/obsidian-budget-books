@@ -1,0 +1,9 @@
+{
+  "id": "budget-books",
+  "name": "Budget Books",
+  "version": "1.0.0",
+  "minAppVersion": "1.8.0",
+  "description": "Cambia de libro (personal / PIGNUS / AquaClyva / …) dentro de Budget Vault, sin cambiar de vault: agrega un selector en la barra superior.",
+  "author": "Yovick",
+  "isDesktopOnly": false
+}
