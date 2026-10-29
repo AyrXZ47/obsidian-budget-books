@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 Yovick
 # Copia el plugin al vault. El vault se sincroniza por Syncthing, así que
 # esto se corre UNA vez en la máquina donde editás: los demás dispositivos
 # reciben la copia.

@@ -1,60 +1,97 @@
 # Budget Books
 
-Selector de libro para **Budget Vault** (`budget-app`), el plugin de finanzas de
-Obsidian. Agrega un desplegable en la barra superior que cambia entre libros
-(personal, PIGNUS, AquaClyva, …) sin abrir un vault por libro.
+[Español](README.es.md)
 
-## El problema
+A **book selector for [Budget Vault](https://github.com/RuanPienaarCode/budget-vault)**
+(`budget-app`), the Obsidian budgeting plugin. It adds a dropdown to Budget Vault's
+top bar that switches between budget folders — personal, business, one per client —
+so you do not need one vault per book.
 
-Budget Vault lee **una sola carpeta de presupuesto por plugin**
-(`settings.budgetFolder`). Para llevar contabilidades separadas —y que el socio
-o la familia pueda ver la suya completa, sin filtrar la personal— hace falta
-cambiar de carpeta.
+> Unofficial. Not affiliated with, endorsed by, or supported by the Budget Vault
+> author. Requirements and limits are listed below; read them before relying on it.
 
-## La solución (y por qué no es un fork)
+## The problem
 
-Dos llamadas por API pública del otro plugin:
+Budget Vault reads **one budget folder per plugin** (`settings.budgetFolder`). To
+keep separate sets of books — so a partner or a family member sees their own
+complete ledger, and only theirs — that folder has to change.
 
-1. `plugin.settings.budgetFolder = 'Finances/PIGNUS'` + `saveSettings()`
-2. `view.appCtl.reload()` — relee el vault
+## How it works (and why it is not a fork)
 
-Funciona porque `basePath()` de Budget Vault
-(`src/io.js`: `const basePath = () => normalizePath(plugin.settings.budgetFolder)`)
-lee el setting **en cada llamada**, no lo captura al registrarse. Así un cambio de
-setting + recarga es un cambio de libro completo, sin reinstanciar nada.
+Two calls against the running plugin:
 
-**No se toca el bundle de Budget Vault**, así que sus actualizaciones no rompen
-esto. Un fork obligaría a mergear cada release (el autor publica cada ~5 días).
+1. `plugin.settings.budgetFolder = 'Finances/Business'` and `saveSettings()`
+2. `view.appCtl.reload()` — re-reads the vault from disk
 
-## Descubrimiento automático
+This works because Budget Vault's `basePath()` (`src/io.js`:
+`const basePath = () => normalizePath(plugin.settings.budgetFolder)`) reads the
+setting **on every call** instead of capturing it at registration. One setting
+write plus one reload is a complete book change, with nothing reinstantiated.
 
-Cualquier carpeta bajo `Finances/` que contenga un `Settings.md` es un libro.
-Se lista sola. Para mostrar un nombre distinto al de la carpeta:
+**Budget Vault's bundle is never modified**, so its own updates cannot break this.
+A fork would have to merge every release, and the upstream author ships often.
+
+## Requirements
+
+- Obsidian 1.8.0 or newer
+- [Budget Vault](https://github.com/RuanPienaarCode/budget-vault) installed and
+  enabled
+
+## Install
+
+No build step, nothing minified: `main.js` is the source.
+
+```bash
+VAULT="$HOME/Sync/Notes"        # your vault path
+mkdir -p "$VAULT/.obsidian/plugins/budget-books"
+cp manifest.json main.js "$VAULT/.obsidian/plugins/budget-books/"
+```
+
+Or edit the defaults in [`install.sh`](install.sh) and run `./install.sh`.
+
+Then: **Settings → Community plugins → enable Budget Books**.
+
+Because `.obsidian/plugins/` lives inside the synced vault, the plugin reaches your
+other devices on its own.
+
+## Book discovery
+
+Any folder under `Finances/` that contains a `Settings.md` is a book, and lists
+itself. Adding a folder with a budget in it makes it appear in the selector.
+
+The active book is always listed, even when it lives outside `Finances/`.
+
+To show a display name other than the folder name, write `data.json`
+(see [`data.example.json`](data.example.json)):
 
 ```json
 { "labels": { "Finances/Budget": "Personal" } }
 ```
 
-## Instalación
+`Finances/Budget` is Budget Vault's default folder, which is why it carries that
+name instead of something friendlier.
 
-```bash
-./install.sh
-```
+## Known limits
 
-Luego: Ajustes → Community plugins → activar **Budget Books**.
+- The selector is injected into Budget Vault's top bar. If a future version changes
+  that markup, the `<select>` disappears; the command `Budget Books: Cambiar de
+  libro` in the command palette keeps working.
+- It reaches other plugins through `app.plugins`, which is not part of Obsidian's
+  public API. It is the de facto mechanism for plugins that talk to each other.
+- It writes `budgetFolder` into Budget Vault's `data.json`, which is synced too, so
+  the active book follows you across devices. Two devices switching books at the
+  same time can produce a sync conflict in that one file.
+- It refuses to switch while a page has unsaved edits: the row would otherwise be
+  written into the wrong book.
+- UI strings and the command names are in Spanish.
+- It is a selector, not a merger. Books stay separate on disk; there is no
+  consolidated view across them.
 
-Como `.obsidian/plugins/` vive dentro de la carpeta sincronizada, el plugin
-llega solo al resto de los dispositivos.
+## License
 
-## Límites conocidos
+GPL-3.0-only — see [LICENSE](LICENSE).
 
-- El selector se inyecta en la barra superior de Budget Vault. Si una versión
-  futura cambia ese markup, el `<select>` desaparece; el comando de paleta
-  `Cambiar de libro` sigue funcionando.
-- Usa `app.plugins`, que no es API oficial de Obsidian. Es el mecanismo estándar
-  de facto para plugins que se hablan entre sí.
-- `budgetFolder` vive en el `data.json` de Budget Vault, que **también se
-  sincroniza**: el libro activo te sigue entre dispositivos. Dos dispositivos
-  cambiando de libro a la vez pueden generar un conflicto de Syncthing en ese
-  archivo (se resuelve con lo que hay en `.stversions`).
-- No cambia de libro si hay una página con cambios sin guardar.
+No Budget Vault code is copied, bundled, or imported here. This plugin talks to it
+at runtime through Obsidian's plugin registry, so its AGPL-3.0 license does not
+extend to this repository. GPL-3.0 works may be combined with AGPL-3.0 works
+(GPL-3.0 §13), which keeps this compatible with the upstream choice.
