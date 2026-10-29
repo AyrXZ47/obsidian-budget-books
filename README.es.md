@@ -43,6 +43,10 @@ Se lista sola. Para mostrar un nombre distinto al de la carpeta:
 
 Luego: Ajustes → Community plugins → activar **Budget Books**.
 
+O con [BRAT](https://github.com/TfTHacker/obsidian42-brat): **Add Beta plugin**
+→ `AyrXZ47/obsidian-budget-books`. Sigue el último release, así que las
+actualizaciones llegan sin copiar archivos a mano.
+
 Como `.obsidian/plugins/` vive dentro de la carpeta sincronizada, el plugin
 llega solo al resto de los dispositivos.
 

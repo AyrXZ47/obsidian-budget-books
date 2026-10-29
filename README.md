@@ -49,6 +49,10 @@ cp manifest.json main.js "$VAULT/.obsidian/plugins/budget-books/"
 
 Or edit the defaults in [`install.sh`](install.sh) and run `./install.sh`.
 
+Or, if you use [BRAT](https://github.com/TfTHacker/obsidian42-brat): **Add Beta
+plugin** → `AyrXZ47/obsidian-budget-books`. BRAT follows the latest release, so
+updates arrive without copying files around.
+
 Then: **Settings → Community plugins → enable Budget Books**.
 
 Because `.obsidian/plugins/` lives inside the synced vault, the plugin reaches your
