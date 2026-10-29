@@ -1,7 +1,7 @@
 {
   "name": "obsidian-budget-books",
-  "version": "1.0.0",
-  "description": "Switch between budget books (personal, business, ...) inside Budget Vault without opening a vault per book.",
+  "version": "1.0.1",
+  "description": "Switch between budget books inside Budget Vault, so personal and business accounts stay separate without one vault per book.",
   "main": "main.js",
   "scripts": {
     "install-plugin": "./install.sh",
