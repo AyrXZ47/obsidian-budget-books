@@ -10,6 +10,30 @@ so you do not need one vault per book.
 > Unofficial. Not affiliated with, endorsed by, or supported by the Budget Vault
 > author. Requirements and limits are listed below; read them before relying on it.
 
+## Support status
+
+Budget Books is a **sibling plugin**, not part of Budget Vault. It switches books
+through two Budget Vault internals: `plugin.settings.budgetFolder` (plus
+`saveSettings()`) and `view.appCtl.reload()`. Budget Vault's public API is read-only
+(`apiVersion 1`), so this write path is **unsupported** by the Budget Vault author:
+a future release may change or remove it without notice.
+
+Pinned to the versions verified:
+
+| Budget Vault | Verification |
+|---|---|
+| 1.54.0 | Live vault: switching books works. |
+| 1.56.0 | Source: `basePath()` reads `settings.budgetFolder` on every call; `appCtl.reload()` exists. |
+| 1.58.0 | Source re-checked 2026-11-05: both hooks are still present. |
+
+Upstream position: [discussion #154](https://github.com/RuanPienaarCode/budget-vault/discussions/154).
+The author prefers the sibling plugin for now and will design a write API only if
+multi-book becomes a real need. If that happens, Budget Books will be its first
+consumer.
+
+If a Budget Vault update breaks switching, change the folder in Budget Vault's own
+settings as the fallback; there is no public write API to depend on.
+
 ## The problem
 
 Budget Vault reads **one budget folder per plugin** (`settings.budgetFolder`). To
@@ -18,7 +42,8 @@ complete ledger, and only theirs — that folder has to change.
 
 ## How it works (and why it is not a fork)
 
-Two calls against the running plugin:
+Two calls against the running plugin (both internals, not public API — see
+[Support status](#support-status)):
 
 1. `plugin.settings.budgetFolder = 'Finances/Business'` and `saveSettings()`
 2. `view.appCtl.reload()` — re-reads the vault from disk
@@ -28,8 +53,9 @@ This works because Budget Vault's `basePath()` (`src/io.js`:
 setting **on every call** instead of capturing it at registration. One setting
 write plus one reload is a complete book change, with nothing reinstantiated.
 
-**Budget Vault's bundle is never modified**, so its own updates cannot break this.
-A fork would have to merge every release, and the upstream author ships often.
+**Budget Vault's bundle is never modified**, so there is no fork to keep merging. That
+does not make the coupling supported: the two hooks above are still internals and can
+change in a release.
 
 ## Requirements
 
@@ -77,6 +103,9 @@ name instead of something friendlier.
 
 ## Known limits
 
+- The write path is unsupported and pinned to Budget Vault 1.54.0, 1.56.0, and
+  1.58.0 (see [Support status](#support-status)). A release outside that list may
+  break switching without notice.
 - The selector is injected into Budget Vault's top bar. If a future version changes
   that markup, the `<select>` disappears; the command `Budget Books: Cambiar de
   libro` in the command palette keeps working.

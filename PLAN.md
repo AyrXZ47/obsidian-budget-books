@@ -32,7 +32,22 @@ Eso es todo. **No hay que modificar código** para un libro nuevo.
   entre dispositivos porque vive en el `data.json` de Budget Vault.
 - **Selector dentro del drawer** en vez de la barra superior, para pantallas angostas.
 
-## 3. Fragilidad conocida
+## 3. Acoplamiento y fragilidad conocida
+
+**No soportado por Budget Vault.** El cambio de libro escribe
+`plugin.settings.budgetFolder` y llama `view.appCtl.reload()`. La API pública de
+Budget Vault es de solo lectura (`apiVersion 1`), así que este camino es interno.
+Ruan aceptó el plugin hermano, pero pidió documentar el acoplamiento como no
+soportado y fijarlo a las versiones verificadas (discusión #154).
+
+| Budget Vault | Verificación |
+|---|---|
+| 1.54.0 | En vivo: cambio de libro. |
+| 1.56.0 | Código: `basePath()` lee el setting en cada llamada y `appCtl.reload()` existe. |
+| 1.58.0 | Código re-revisado 2026-11-05: los dos hooks siguen presentes. |
+
+Si una versión futura rompe esto, el fallback es cambiar la carpeta desde los
+ajustes del propio Budget Vault. No hay API pública de escritura.
 
 - El `<select>` se inyecta en `.topbar .ml-auto`. Si Budget Vault cambia ese markup, el
   desplegable desaparece; el comando `Cambiar de libro` sigue funcionando.
@@ -42,9 +57,18 @@ Eso es todo. **No hay que modificar código** para un libro nuevo.
 
 ## 4. Verificación después de cada cambio en Budget Vault
 
+Antes de dar por buena una versión nueva, confirmar en el código de Budget Vault que
+siguen existiendo los dos hooks:
+
 ```bash
-# en el vault, con Obsidian cerrado o después de "Reload app"
+rg -n "const basePath|reload: async" src/io.js src/controller.js
+```
+
+Después, en el vault con Obsidian cerrado o después de "Reload app":
+
+```bash
 node --check .obsidian/plugins/budget-books/main.js
 ```
 
 Y en Obsidian: cambiar de libro y confirmar que el Dashboard cambia de cuentas.
+Actualizar la tabla de §3 con la versión verificada.

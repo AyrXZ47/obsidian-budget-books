@@ -6,10 +6,15 @@
    POR QUÉ EXISTE. Budget Vault tiene UNA sola carpeta de presupuesto por plugin
    (`plugin.settings.budgetFolder`). Para tener varios libros (personal, PIGNUS,
    AquaClyva) sin abrir varios vaults, este plugin hace exactamente dos cosas,
-   las dos por API pública del otro plugin:
+   las dos por hooks INTERNOS del otro plugin (no son API pública):
 
      1. Escribe `settings.budgetFolder` y guarda.
-     2. Pide al Budget Vault que relea el disco (`view.appCtl.reloadFromDisk()`).
+     2. Pide al Budget Vault que relea el disco (`view.appCtl.reload()`).
+
+   ACOPLAMIENTO NO SOPORTADO. La API pública de Budget Vault es de solo lectura
+   (`apiVersion 1`); el autor prefiere este plugin hermano y pidió documentar
+   este camino como no soportado (discusión #154). Verificado contra 1.54.0
+   (en vivo), 1.56.0 y 1.58.0 (código). Una versión futura puede romperlo.
 
    Eso funciona porque `basePath()` de Budget Vault
    (`src/io.js`: `const basePath = () => normalizePath(plugin.settings.budgetFolder)`)
@@ -17,9 +22,9 @@
    el setting y releer es un cambio de libro completo, sin reinstanciar nada y
    sin tocar el código de Budget Vault.
 
-   NO modifica el bundle de Budget Vault: sobrevive a sus actualizaciones. Lo
-   único "frágil" son dos strings (`budget-app`, `budget-app-view`), los dos
-   públicos y estables.
+   NO modifica el bundle de Budget Vault, pero no hay garantía de compatibilidad:
+   los dos hooks son internos. Además de los hooks, hay dos strings
+   (`budget-app`, `budget-app-view`), los dos públicos y estables.
 
    Descubre los libros solo: cualquier carpeta bajo `Finances/` que tenga un
    `Settings.md` es un libro. Agregás una carpeta y aparece en el selector. */
